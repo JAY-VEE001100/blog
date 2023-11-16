@@ -89,7 +89,7 @@ receive()
 
 ```
 
-## SERVER.PY:
+## SERVER.py:
 
 ``` python
 import socket
@@ -201,7 +201,7 @@ receive()
 
 ### In its most basic configuration, the server takes on the responsibility of overseeing users. A new thread is initiated to manage messages from a connected client, and the client is included in the list. The server consistently observes each message transmitted by a client, subsequently broadcasting it to all other connected clients.
 
-# Client.py
+# Client.py:
 
 ``` python
 import socket
@@ -294,7 +294,7 @@ class Client:
 # Create an instance of the Client class
 client_instance = Client(HOST, PORT)
 ```
-## CLIENT.PY:
+## CLIENT.py:
 
 ``` python
 import socket
