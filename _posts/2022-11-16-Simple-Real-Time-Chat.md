@@ -7,9 +7,11 @@ title: Simple Real-time chat (Output)
 
 I have images displaying the output of a simple Python real-time chat application below.
 
-## Source code:
-Server.py
-``` python
+### Source code
+
+#### Server.py
+
+```python
 import socket
 import threading
 
@@ -179,3 +181,5 @@ class Client:
 client_instance = Client(HOST, PORT)
 
 ```
+
+This are the source i'm using and
