@@ -449,25 +449,25 @@ client_instance = Client(HOST, PORT)
 - Creates an instance of the `Client` class, initiating the client application with the specified host and port.
 ## Output #1:
 
-![RunClient](../images/run-client.png)
+![RunClient](images/run-client.png)
 
 To handle two or more users, the server.py (server-side) must be run twice or more. The client.py (client-side) must also be run simultaneously. As you can see from the picture or photo, I had two clients connected to the server by running the server.py and the client.py twice. The username can be created or chosen by the user or customer.
 
 ## Output #2:
 
-![Connected](../images/connected.png)
+![Connected](images/connected.png)
 
 From this we can see that after adding a new client, it will notify the other client that there's a another client is joining.
 
 ## Output #3:
 
-![Messaging](../images/messaging.png)
+![Messaging](images/messaging.png)
 
 From this we can see that the Two windows, which stand in for the clients connected to the server, are seen in the figure. In this case, two network-running processes are connected via a two-way communication channel, with one socket serving as one of the ends. Using socket programming to create simple real-time chat apps is helpful.
 
 ## Output #4:
 
-![Listen](../images/listening.png)
+![Listen](images/listening.png)
 
 Here we can see that the server is listening to two clients, where the server can listen both clients.
 
