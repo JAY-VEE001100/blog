@@ -1,120 +1,474 @@
-> March, 2016: If you're on an old version of Jekyll Now and run into a) build warnings or b) syntax highlighting issues caused by [Jekyll 3 and GitHub Pages updates](https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0), just :sparkles:[update your _config.yml](https://github.com/barryclark/jekyll-now/pull/445/files):sparkles: and you'll be set!
+---
+layout: post
+title: Simple Real-time chat using Tkinter and Socket Programming in Python!
+---
 
-# Jekyll Now
+For our Event Driven Programming exercise, I will be creating a simple real-time chat application using the socket application. In essence, sockets and the socket API are used to send messages over a network.
 
-**Jekyll** is a static site generator that's perfect for GitHub hosted blogs ([Jekyll Repository](https://github.com/jekyll/jekyll))
+## Real-time chat (Output)
 
-**Jekyll Now** makes it easier to create your Jekyll blog, by eliminating a lot of the up front setup.
+I have images displaying the output of a simple Python real-time chat application below.
 
-- You don't need to touch the command line
-- You don't need to install/configure ruby, rvm/rbenv, ruby gems :relaxed:
-- You don't need to install runtime dependencies like markdown processors, Pygments, etc
-- If you're on Windows, this will make setting up Jekyll a lot easier
-- It's easy to try out, you can just delete your forked repository if you don't like it
+### Source code:
 
-In a few minutes you'll be set up with a minimal, responsive blog like the one below giving you more time to spend on writing epic blog posts!
+#### Server.py
 
-![Jekyll Now Theme Screenshot](/images/jekyll-now-theme-screenshot.jpg "Jekyll Now Theme Screenshot")
+```python
+import socket
+import threading
 
-## Quick Start
+HOST = '192.168.100.19'
+PORT = 5501
 
-### Step 1) Fork Jekyll Now to your User Repository
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server.bind((HOST, PORT))
 
-Fork this repo, then rename the repository to yourgithubusername.github.io.
+server.listen()
 
-Your Jekyll blog will often be viewable immediately at <https://yourgithubusername.github.io> (if it's not, you can often force it to build by completing step 2)
+clients = []
+nicknames = []
 
-![Step 1](/images/step1.gif "Step 1")
 
-### Step 2) Customize and view your site
+# broadcast
+def broadcast(message, sender):
+    for client in clients:
+        if client != sender:
+            try:
+                client.send(message)
+            except:
+                index = clients.index(client)
+                clients.remove(client)
+                client.close()
+                nickname = nicknames[index]
+                broadcast(f'{nickname} has left the chat.'.encode('utf-8'), client)
+                nicknames.remove(nickname)
+                break
 
-Enter your site name, description, avatar and many other options by editing the _config.yml file. You can easily turn on Google Analytics tracking, Disqus commenting and social icons here too.
 
-Making a change to _config.yml (or any file in your repository) will force GitHub Pages to rebuild your site with jekyll. Your rebuilt site will be viewable a few seconds later at <https://yourgithubusername.github.io> - if not, give it ten minutes as GitHub suggests and it'll appear soon
+# handle function
+def handle(client):
+    while True:
+        try:
+            message = client.recv(1024)
+            if not message:
+                break  # exit the loop if no message is received
+            broadcast(message, client)
+        except:
+            index = clients.index(client)
+            clients.remove(client)
+            client.close()
+            nickname = nicknames[index]
+            broadcast(f'{nickname} has left the chat.'.encode('utf-8'), client)
+            nicknames.remove(nickname)
+            break
 
-> There are 3 different ways that you can make changes to your blog's files:
 
-> 1. Edit files within your new username.github.io repository in the browser at GitHub.com (shown below).
-> 2. Use a third party GitHub content editor, like [Prose by Development Seed](http://prose.io). It's optimized for use with Jekyll making markdown editing, writing drafts, and uploading images really easy.
-> 3. Clone down your repository and make updates locally, then push them to your GitHub repository.
+# receive function
+def receive():
+    while True:
+        client, address = server.accept()
+        print(f"Connected with {str(address)}!")
 
-![_config.yml](/images/config.png "_config.yml")
+        client.send("NICK".encode('utf-8'))
+        nickname = client.recv(1024).decode('utf-8')
 
-### Step 3) Publish your first blog post
+        nicknames.append(nickname)
+        clients.append(client)
 
-Edit `/_posts/2014-3-3-Hello-World.md` to publish your first blog post. This [Markdown Cheatsheet](http://www.jekyllnow.com/Markdown-Style-Guide/) might come in handy.
+        print(f"Nickname of the client is {nickname}")
+        broadcast(f"{nickname} connected to the server!\n".encode('utf-8'), client)
+        client.send("Connected to the server".encode('utf-8'))
 
-![First Post](/images/first-post.png "First Post")
+        thread = threading.Thread(target=handle, args=(client,))
+        thread.start()
 
-> You can add additional posts in the browser on GitHub.com too! Just hit the + icon in `/_posts/` to create new content. Just make sure to include the [front-matter](http://jekyllrb.com/docs/frontmatter/) block at the top of each new blog post and make sure the post's filename is in this format: year-month-day-title.md
 
-## Local Development
+# handle
+print("Server running")
+receive()
 
-1. Install Jekyll and plug-ins in one fell swoop. `gem install github-pages` This mirrors the plug-ins used by GitHub Pages on your local machine including Jekyll, Sass, etc.
-2. Clone down your fork `git clone https://github.com/yourusername/yourusername.github.io.git`
-3. Serve the site and watch for markup/sass changes `jekyll serve`
-4. View your website at http://127.0.0.1:4000/
-5. Commit any changes and push everything to the master branch of your GitHub user repository. GitHub Pages will then rebuild and serve your website.
+```
 
-## Moar!
+## SERVER.py:
 
-I've created a more detailed walkthrough, [**Build A Blog With Jekyll And GitHub Pages**](http://www.smashingmagazine.com/2014/08/01/build-blog-jekyll-github-pages/) over at the Smashing Magazine website. Check it out if you'd like a more detailed walkthrough and some background on Jekyll. :metal:
+``` python
+import socket
+import threading
+```
 
-It covers:
+- To handle sockets and deal with threads, this imports the threading module and the socket module.
 
-- A more detailed walkthrough of setting up your Jekyll blog
-- Common issues that you might encounter while using Jekyll
-- Importing from Wordpress, using your own domain name, and blogging in your favorite editor
-- Theming in Jekyll, with Liquid templating examples
-- A quick look at Jekyll 2.0’s new features, including Sass/Coffeescript support and Collections
+``` python
+HOST = '192.168.100.19'
+PORT = 5501
+```
 
-## Jekyll Now Features
+- Sets the host IP address and port number for the server.
 
-✓ Command-line free _fork-first workflow_, using GitHub.com to create, customize and post to your blog  
-✓ Fully responsive and mobile optimized base theme (**[Theme Demo](http://jekyllnow.com)**)  
-✓ Sass/Coffeescript support using Jekyll 2.0  
-✓ Free hosting on your GitHub Pages user site  
-✓ Markdown blogging  
-✓ Syntax highlighting  
-✓ Disqus commenting  
-✓ Google Analytics integration  
-✓ SVG social icons for your footer  
-✓ 3 http requests, including your avatar  
+``` python
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+```
 
-✘ No installing dependencies
-✘ No need to set up local development  
-✘ No configuring plugins  
-✘ No need to spend time on theming  
-✘ More time to code other things ... wait ✓!  
+- Creates a socket object using `IPv4 (AF_INET)` and `TCP (SOCK_STREAM)` for the server.
+- This socket is designated as IPv4 by `AF_INET` and as a TCP socket for handling streams of data by `SOCK_STREAM`.
+ 
+``` python
+server.listen()
+```
 
-## Questions?
+- Listens for incoming connections. The server can accept connections from clients after this call.
 
-[Open an Issue](https://github.com/barryclark/jekyll-now/issues/new) and let's chat!
+``` python
+clients = []
+nicknames = []
+```
 
-## Other forkable themes
+- Lists to store connected clients and their nicknames.
+- To enable the server to track the quantity of clients attempting connection.
 
-You can use the [Quick Start](https://github.com/barryclark/jekyll-now#quick-start) workflow with other themes that are set up to be forked too! Here are some of my favorites:
+``` python
+# broadcast
+def broadcast(message, sender):
+    for client in clients:
+        if client != sender:
+            try:
+                client.send(message)
+            except:
+                # Handles exceptions if there is an issue sending a message to a client.
+                index = clients.index(client)
+                clients.remove(client)
+                client.close()
+                nickname = nicknames[index]
+                broadcast(f'{nickname} has left the chat.'.encode('utf-8'), client)
+                nicknames.remove(nickname)
+                break
+```
 
-- [Hyde](https://github.com/poole/hyde) by MDO
-- [Lanyon](https://github.com/poole/lanyon) by MDO
-- [mojombo.github.io](https://github.com/mojombo/mojombo.github.io) by Tom Preston-Werner
-- [Left](https://github.com/holman/left) by Zach Holman
-- [Minimal Mistakes](https://github.com/mmistakes/minimal-mistakes) by Michael Rose
-- [Skinny Bones](https://github.com/mmistakes/skinny-bones-jekyll) by Michael Rose
+- Function to broadcast a message to all connected clients except the sender.
 
-## Credits
+``` python
+# handle function
+def handle(client):
+    while True:
+        try:
+            message = client.recv(1024)
+            if not message:
+                break  # exit the loop if no message is received
+            broadcast(message, client)
+        except:
+            # Handles exceptions if there is an issue handling a client's message.
+            index = clients.index(client)
+            clients.remove(client)
+            client.close()
+            nickname = nicknames[index]
+            broadcast(f'{nickname} has left the chat.'.encode('utf-8'), client)
+            nicknames.remove(nickname)
+            break
+```
 
-- [Jekyll](https://github.com/jekyll/jekyll) - Thanks to its creators, contributors and maintainers.
-- [SVG icons](https://github.com/neilorangepeel/Free-Social-Icons) - Thanks, Neil Orange Peel. They're beautiful.
-- [Solarized Light Pygments](https://gist.github.com/edwardhotchkiss/2005058) - Thanks, Edward.
-- [Joel Glovier](http://joelglovier.com/writing/) - Great Jekyll articles. I used Joel's feed.xml in this repository.
-- [David Furnes](https://github.com/dfurnes), [Jon Uy](https://github.com/jonuy), [Luke Patton](https://github.com/lkpttn) - Thanks for the design/code reviews.
-- [Bart Kiers](https://github.com/bkiers), [Florian Simon](https://github.com/vermluh), [Henry Stanley](https://github.com/henryaj), [Hun Jae Lee](https://github.com/hunjaelee), [Javier Cejudo](https://github.com/javiercejudo), [Peter Etelej](https://github.com/etelej), [Ben Abbott](https://github.com/jaminscript), [Ray Nicholus](https://github.com/rnicholus), [Erin Grand](https://github.com/eringrand), [Léo Colombaro](https://github.com/LeoColomb), [Dean Attali](https://github.com/daattali), [Clayton Errington](https://github.com/cjerrington), [Colton Fitzgerald](https://github.com/coltonfitzgerald), [Trace Mayer](https://github.com/sunnankar) - Thanks for your [fantastic contributions](https://github.com/barryclark/jekyll-now/commits/master) to the project!
+- Function to handle messages from a specific client. It continuously receives messages and broadcasts them to others.
 
-## Contributing
+``` python
+# receive function
+def receive():
+    while True:
+        client, address = server.accept()
+        print(f"Connected with {str(address)}!")
 
-Issues and Pull Requests are greatly appreciated. If you've never contributed to an open source project before I'm more than happy to walk you through how to create a pull request.
+        client.send("NICK".encode('utf-8'))
+        nickname = client.recv(1024).decode('utf-8')
 
-You can start by [opening an issue](https://github.com/barryclark/jekyll-now/issues/new) describing the problem that you're looking to resolve and we'll go from there.
+        nicknames.append(nickname)
+        clients.append(client)
 
-I want to keep Jekyll Now as minimal as possible. Every line of code should be one that's useful to 90% of the people using it. Please bear that in mind when submitting feature requests. If it's not something that most people will use, it probably won't get merged. :guardsman:
+        print(f"Nickname of the client is {nickname}")
+        broadcast(f"{nickname} connected to the server!\n".encode('utf-8'), client)
+        client.send("Connected to the server".encode('utf-8'))
+
+        thread = threading.Thread(target=handle, args=(client,))
+        thread.start()
+```
+
+- Function to accept incoming connections from clients, receive their nicknames, and start a new thread to handle the client.
+
+``` python
+# handle
+print("Server running")
+receive()
+```
+
+- Initiates the server by printing a message and calling the receive function to start accepting connections.
+
+In its most basic configuration, the server takes on the responsibility of overseeing users. A new thread is initiated to manage messages from a connected client, and the client is included in the list. The server consistently observes each message transmitted by a client, subsequently broadcasting it to all other connected clients.
+
+# Client.py:
+
+``` python
+import socket
+import threading
+import tkinter
+import tkinter.scrolledtext
+from tkinter import simpledialog
+
+HOST = '192.168.100.19'
+PORT = 5501
+
+class Client:
+    
+    def __init__(self, HOST, PORT):
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sock.connect((HOST, PORT))
+        msg = tkinter.Tk()
+        msg.withdraw()
+        
+        self.nickname = simpledialog.askstring("Nickname", "Please choose a nickname", parent=msg)
+        
+        self.gui_done = False
+        self.running = True
+        
+        gui_thread = threading.Thread(target=self.gui_loop)
+        receive_thread = threading.Thread(target=self.receive)
+
+        gui_thread.start()
+        receive_thread.start()
+
+    def gui_loop(self):
+        self.win = tkinter.Tk()
+        self.win.configure(bg="gray")
+    
+        self.chat_label = tkinter.Label(self.win, text="Chat:", bg="lightgray")
+        self.chat_label.config(font=("Arial", 12))
+        self.chat_label.pack(padx=20, pady=5)
+    
+        self.text_area = tkinter.scrolledtext.ScrolledText(self.win)
+        self.text_area.pack(padx=20, pady=5)
+        self.text_area.config(state='disabled')
+    
+        self.msg_label = tkinter.Label(self.win, text="Message", bg="lightgray")
+        self.msg_label.config(font=("Arial", 12))
+        self.msg_label.pack(padx=20, pady=5)
+    
+        self.input_area = tkinter.Text(self.win, height=3)
+        self.input_area.pack(padx=20, pady=5)
+
+        self.send_button = tkinter.Button(self.win, text="Send", command=self.write)
+        self.send_button.config(font=("Arial", 12))
+        self.send_button.pack(padx=20, pady=5)
+    
+        self.gui_done = True
+    
+        self.win.protocol("WM_DELETE_WINDOW", self.stop)
+    
+        self.win.mainloop()
+    
+    def write(self):
+        message = f"{self.nickname}: {self.input_area.get('1.0', 'end')}"
+        self.sock.send(message.encode('utf-8'))
+        self.input_area.delete('1.0', 'end')
+
+    def stop(self):
+        self.running = False
+        self.win.destroy()
+        self.sock.close()
+        exit(0)
+
+    def receive(self):
+        while self.running:
+            try:
+                message = self.sock.recv(1024).decode('utf-8')
+                if message == 'NICK':
+                    self.sock.send(self.nickname.encode('utf-8'))
+                else:
+                    if self.gui_done:
+                        self.text_area.config(state='normal')
+                        self.text_area.insert('end', message)
+                        self.text_area.yview('end')
+                        self.text_area.config(state='disabled')
+            except ConnectionAbortedError:
+                break
+            except:
+                print("Error")
+                self.sock.close()
+                break
+
+# Create an instance of the Client class
+client_instance = Client(HOST, PORT)
+```
+## CLIENT.py:
+
+``` python
+import socket
+import threading
+import tkinter
+import tkinter.scrolledtext
+from tkinter import simpledialog
+```
+
+- Imports necessary modules: `socket` for networking, `threading` for working with threads, and `tkinter` for the GUI components.
+- Socket: Creating and managing sockets.
+- Threading: This module enables the simultaneous execution of multiple threads.
+- Tkinter: Necessary for creating a graphical user interface (GUI) for the application.
+- ScrolledText: A widget utilized to enable scrolling within the text area.
+- SimpleDialog: Employed to generate a dialog for inputs, such as usernames.
+
+``` python
+HOST = '192.168.100.19'
+PORT = 5501
+```
+
+- Same goes to Server, Sets the host IP address and port number for the client to connect to the server.
+- The PORT serves as the client's port number, and the HOST specifies the IP address—similarly applicable to the server.
+
+``` python
+class Client:
+    
+    def __init__(self, HOST, PORT):
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sock.connect((HOST, PORT))
+        msg = tkinter.Tk()
+        msg.withdraw()
+```
+
+- Defines a class ***"Client"*** with an `__init__` method. Initializes a socket for the client and connects to the server. Also, creates a hidden Tkinter window `(msg)` for user input.
+- `socket.socket`: Utilized for creating new sockets.
+- `socket.AF_INET`: Indicates that the address belongs to the IPV4 address family.
+- `socket.SOCK_STREAM`: Identifies the socket type, specifying it as a TCP socket.
+- `connect((HOST, PORT))`: Establishes the connection to the server by setting up the host and port.
+``` python
+        self.nickname = simpledialog.askstring("Nickname", "Please choose a nickname", parent=msg)
+```
+
+- Asks the user to choose a nickname using a Tkinter dialog.
+
+``` python
+        self.gui_done = False
+        self.running = True
+        
+        gui_thread = threading.Thread(target=self.gui_loop)
+        receive_thread = threading.Thread(target=self.receive)
+
+        gui_thread.start()
+        receive_thread.start()
+
+```
+
+- Initializes variables for GUI status and running status. Creates two threads for the GUI loop `(gui_thread)` and message receiving `(receive_thread)` and starts them.
+
+``` python
+    def gui_loop(self):
+        self.win = tkinter.Tk()
+        self.win.configure(bg="gray")
+```
+
+- Defines the `gui_loop` method to create and configure the main GUI window.
+
+``` python
+        self.chat_label = tkinter.Label(self.win, text="Chat:", bg="lightgray")
+        self.chat_label.config(font=("Arial", 12))
+        self.chat_label.pack(padx=20, pady=5)
+    
+        self.text_area = tkinter.scrolledtext.ScrolledText(self.win)
+        self.text_area.pack(padx=20, pady=5)
+        self.text_area.config(state='disabled')
+```
+
+- Configures and packs labels and a scrolled text area for displaying the chat messages.
+
+``` python
+        self.msg_label = tkinter.Label(self.win, text="Message", bg="lightgray")
+        self.msg_label.config(font=("Arial", 12))
+        self.msg_label.pack(padx=20, pady=5)
+    
+        self.input_area = tkinter.Text(self.win, height=3)
+        self.input_area.pack(padx=20, pady=5)
+```
+
+- Configures and packs labels and a text area for typing messages.
+
+``` python
+        self.send_button = tkinter.Button(self.win, text="Send", command=self.write)
+        self.send_button.config(font=("Arial", 12))
+        self.send_button.pack(padx=20, pady=5)
+    
+        self.gui_done = True
+    
+        self.win.protocol("WM_DELETE_WINDOW", self.stop)
+    
+        self.win.mainloop()
+```
+
+- Configures and packs a button for sending messages. Sets `gui_done` to True, binds the window close event to the `stop` method, and starts the Tkinter main loop.
+
+``` python
+    def write(self):
+        message = f"{self.nickname}: {self.input_area.get('1.0', 'end')}"
+        self.sock.send(message.encode('utf-8'))
+        self.input_area.delete('1.0', 'end')
+```
+
+- Defines the `write` method to send messages to the server.
+
+``` python
+    def stop(self):
+        self.running = False
+        self.win.destroy()
+        self.sock.close()
+        exit(0)
+```
+
+- Defines the `stop` method to stop the client, close the GUI, close the socket, and exit the program.
+
+``` python
+    def receive(self):
+        while self.running:
+            try:
+                message = self.sock.recv(1024).decode('utf-8')
+                if message == 'NICK':
+                    self.sock.send(self.nickname.encode('utf-8'))
+                else:
+                    if self.gui_done:
+                        self.text_area.config(state='normal')
+                        self.text_area.insert('end', message)
+                        self.text_area.yview('end')
+                        self.text_area.config(state='disabled')
+            except ConnectionAbortedError:
+                break
+            except:
+                print("Error")
+                self.sock.close()
+                break
+```
+
+- Defines the `receive` method to continuously receive messages from the server and update the GUI text area. Handles disconnection errors.
+
+``` python
+# Create an instance of the Client class
+client_instance = Client(HOST, PORT)
+```
+
+- Creates an instance of the `Client` class, initiating the client application with the specified host and port.
+## Output #1:
+
+![RunClient](../images/run-client.png)
+
+To handle two or more users, the server.py (server-side) must be run twice or more. The client.py (client-side) must also be run simultaneously. As you can see from the picture or photo, I had two clients connected to the server by running the server.py and the client.py twice. The username can be created or chosen by the user or customer.
+
+## Output #2:
+
+![Connected](../images/connected.png)
+
+From this we can see that after adding a new client, it will notify the other client that there's a another client is joining.
+
+## Output #3:
+
+![Messaging](../images/messaging.png)
+
+From this we can see that the Two windows, which stand in for the clients connected to the server, are seen in the figure. In this case, two network-running processes are connected via a two-way communication channel, with one socket serving as one of the ends. Using socket programming to create simple real-time chat apps is helpful.
+
+## Output #4:
+
+![Listen](../images/listening.png)
+
+Here we can see that the server is listening to two clients, where the server can listen both clients.
+
+### In summary, this code establishes a connection for a chat application between a client and a server. It employs tkinter for a graphical interface, incorporates message sending and receiving functionalities, and implements a thread to handle continuous message reception.
