@@ -199,7 +199,7 @@ receive()
 
 - Initiates the server by printing a message and calling the receive function to start accepting connections.
 
-### In its most basic configuration, the server takes on the responsibility of overseeing users. A new thread is initiated to manage messages from a connected client, and the client is included in the list. The server consistently observes each message transmitted by a client, subsequently broadcasting it to all other connected clients.
+In its most basic configuration, the server takes on the responsibility of overseeing users. A new thread is initiated to manage messages from a connected client, and the client is included in the list. The server consistently observes each message transmitted by a client, subsequently broadcasting it to all other connected clients.
 
 # Client.py:
 
