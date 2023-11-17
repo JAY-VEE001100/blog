@@ -471,4 +471,6 @@ From this we can see that the Two windows, which stand in for the clients connec
 
 Here we can see that the server is listening to two clients, where the server can listen both clients.
 
+# Conclusion
+
 ### In summary, this code establishes a connection for a chat application between a client and a server. It employs tkinter for a graphical interface, incorporates message sending and receiving functionalities, and implements a thread to handle continuous message reception.
