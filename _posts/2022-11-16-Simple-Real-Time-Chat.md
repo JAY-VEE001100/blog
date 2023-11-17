@@ -109,8 +109,8 @@ PORT = 5501
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 ```
 
-- Creates a socket object using IPv4 (AF_INET) and TCP (SOCK_STREAM) for the server.
-- This socket is designated as IPv4 by AF_INET and as a TCP socket for handling streams of data by SOCK_STREAM.
+- Creates a socket object using `IPv4 (AF_INET)` and `TCP (SOCK_STREAM)` for the server.
+- This socket is designated as IPv4 by `AF_INET` and as a TCP socket for handling streams of data by `SOCK_STREAM`.
  
 ``` python
 server.listen()
@@ -304,7 +304,7 @@ import tkinter.scrolledtext
 from tkinter import simpledialog
 ```
 
-- Imports necessary modules: ***socket*** for networking, ***threading*** for working with threads, and ***tkinter*** for the GUI components.
+- Imports necessary modules: `socket` for networking, `threading` for working with threads, and `tkinter` for the GUI components.
 - Socket: Creating and managing sockets.
 - Threading: This module enables the simultaneous execution of multiple threads.
 - Tkinter: Necessary for creating a graphical user interface (GUI) for the application.
@@ -329,7 +329,7 @@ class Client:
         msg.withdraw()
 ```
 
-- Defines a class "Client" with an ***__init__*** method. Initializes a socket for the client and connects to the server. Also, creates a hidden Tkinter window ***(msg)*** for user input.
+- Defines a class ***"Client"*** with an `__init__` method. Initializes a socket for the client and connects to the server. Also, creates a hidden Tkinter window `(msg)` for user input.
 - `socket.socket`: Utilized for creating new sockets.
 - `socket.AF_INET`: Indicates that the address belongs to the IPV4 address family.
 - `socket.SOCK_STREAM`: Identifies the socket type, specifying it as a TCP socket.
@@ -352,7 +352,7 @@ class Client:
 
 ```
 
-- Initializes variables for GUI status and running status. Creates two threads for the GUI loop ***(gui_thread)*** and message receiving ***(receive_thread)*** and starts them.
+- Initializes variables for GUI status and running status. Creates two threads for the GUI loop `(gui_thread)` and message receiving `(receive_thread)` and starts them.
 
 ``` python
     def gui_loop(self):
@@ -360,7 +360,7 @@ class Client:
         self.win.configure(bg="gray")
 ```
 
-- Defines the ***gui_loop*** method to create and configure the main GUI window.
+- Defines the `gui_loop` method to create and configure the main GUI window.
 
 ``` python
         self.chat_label = tkinter.Label(self.win, text="Chat:", bg="lightgray")
@@ -397,7 +397,7 @@ class Client:
         self.win.mainloop()
 ```
 
-- Configures and packs a button for sending messages. Sets ***gui_done*** to True, binds the window close event to the ***stop*** method, and starts the Tkinter main loop.
+- Configures and packs a button for sending messages. Sets `gui_done` to True, binds the window close event to the `stop` method, and starts the Tkinter main loop.
 
 ``` python
     def write(self):
@@ -406,7 +406,7 @@ class Client:
         self.input_area.delete('1.0', 'end')
 ```
 
-- Defines the ***write*** method to send messages to the server.
+- Defines the `write` method to send messages to the server.
 
 ``` python
     def stop(self):
@@ -416,7 +416,7 @@ class Client:
         exit(0)
 ```
 
-- Defines the ***stop*** method to stop the client, close the GUI, close the socket, and exit the program.
+- Defines the `stop` method to stop the client, close the GUI, close the socket, and exit the program.
 
 ``` python
     def receive(self):
@@ -439,14 +439,14 @@ class Client:
                 break
 ```
 
-- Defines the ***receive*** method to continuously receive messages from the server and update the GUI text area. Handles disconnection errors.
+- Defines the `receive` method to continuously receive messages from the server and update the GUI text area. Handles disconnection errors.
 
 ``` python
 # Create an instance of the Client class
 client_instance = Client(HOST, PORT)
 ```
 
-- Creates an instance of the ***Client*** class, initiating the client application with the specified host and port.
+- Creates an instance of the `Client` class, initiating the client application with the specified host and port.
 ## Output #1:
 
 ![RunClient](../images/run-client.png)
